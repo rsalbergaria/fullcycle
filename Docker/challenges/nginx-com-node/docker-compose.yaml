@@ -1,0 +1,56 @@
+services:
+  app:
+    build: 
+      context: ./node
+      dockerfile: Dockerfile
+    container_name: app
+    networks:
+      - laranet
+    volumes:
+      - ./node:/usr/src/app
+    tty: true
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://app:3000/health || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "3000:3000"
+  db:
+    image: mysql/mysql-server:8.0
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=nodedb
+    networks:
+      - laranet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    networks:
+      - laranet
+    ports:
+      - "8080:80"
+    depends_on:
+      app:
+        condition: service_healthy
+  
+networks:
+  laranet:
+    driver: bridge
