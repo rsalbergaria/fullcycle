@@ -12,10 +12,10 @@ FLUSH PRIVILEGES;
 -- Utiliza o banco de dados nodedb
 USE fullcycle;
 
-CREATE TABLE IF NOT EXISTS CATEGORIES (
+CREATE TABLE IF NOT EXISTS categories (
     id INT auto_increment,
     name VARCHAR(255),
     PRIMARY KEY (id)
 );
 
-INSERT INTO CATEGORIES (name) VALUES ('Eletronicos');
+INSERT INTO categories (name) VALUES ('Eletronicos');
