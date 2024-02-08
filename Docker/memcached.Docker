@@ -1,0 +1,14 @@
+# Use a imagem oficial do Memcached como base
+FROM memcached:latest
+
+# Atualizar os pacotes e instalar as ferramentas necessárias
+RUN apt-get update && \
+    apt-get install -y memcached-tools && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Expor a porta padrão do Memcached
+EXPOSE 11211
+
+# Comando padrão para iniciar o Memcached
+CMD ["memcached", "-m", "64"]
